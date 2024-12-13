@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Baltimore Photographs - Free Stock Photos</title>
+
+    <link href="/css/fastforward.css" rel="stylesheet" type="text/css">
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+
+    <section id="socialMedia">
+
+    </section>
+
+
+</head>
+
+<body style="padding:0px; margin:0px;">
+
+    <style>
+        .containerFLEX {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .innerFLEX {
+            flex: 1 1 50%;
+            padding: 30px;
+            justify-content: center;
+            /* align-content: center; */
+            box-sizing: border-box;
+        }
+
+        .previewSquare {
+            width: 100%;
+            min-height: 400px;
+            display: inline-block;
+            margin: auto;
+        }
+
+        .miniPreview {
+            width: 100px;
+            height: 100px;
+            margin: 0px;
+            display: inline-block;
+            border-radius: 12px;
+        }
+
+        .topnavmobile {
+            display: none;
+        }
+
+        @media all and (max-width:1000px) {
+            .innerFLEX {
+                flex: 1 1 100%;
+            }
+
+            .topnavmobile {
+                display: block;
+                padding: 12px;
+                text-align: center;
+            }
+
+            .topnav {
+                display: none;
+            }
+        }
+    </style>
+    <div class="topnavmobile">
+        Search BaltoPhoto.org<br><br>
+        <input name="q" onkeyup="searchmobile();" type="text" class="hinput" id="filtermobile" size="30"
+            placeholder="Start typing to search..." value="">
+    </div>
+
+    <div class="topnav"
+        style="width:100%; padding:0px 20px 10px; position:fixed; top:0px; background-color:white; box-shadow: 0 0 9px rgba(0, 0, 0, 0.5) !important; z-index: 10;">
+        <div style="float:left; max-width:450px;"> <span class="style2" style="float:left;"><a
+                    href="//baltophoto.org/"><img src="/baltophoto.org.logo.png" alt="Baltimore Photographs"
+                        style="max-width:100%;" border="0"></a></span><br>
+        </div>
+        <div style="float:left; margin-top:40px;">
+            <form action="/" onmouseover="showID('top-description');">
+                <input name="q" onkeyup="search();" type="text" class="hinput" id="filter" size="30"
+                    placeholder="Start typing to search..." value="">
+                <!-- <input type="submit" class="orangesubmitbox1" id="button" value="go">
+                <a href="./?sort=alpha" class="orangesubmitbox1">ALPHA SORT</a> <a href="./?sort=date"
+                    class="orangesubmitbox1">DAte sort</a>  -->
+                <br>
+                <div id="ttcc"></div>
+            </form>
+
+        </div>
+        <div style="float:left; margin-top:40px;">
+
+            <button class="orangesubmitbox1" onclick="location.assign(`/upload/`)">Upload</button>
+            <button class="orangesubmitbox1" onclick="location.assign(`/about/`)">about</button>
+        </div>
+    </div>
+
+
+
+
+
+
+    </div>
+    <div class=" containerFLEX" id="cflex123" style="margin-top: 123px;">
+
+        <div class="innerFLEX" style="background: white;">
+            <div id="focus"></div>
+            <!-- <div id="disqus_thread" style="width:85%;"></div>
+            <script>
+                /**
+                 *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+                 *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+                var disqus_config = function () {
+                    this.page.url = location.href; // Replace PAGE_URL with your page's canonical URL variable
+                    this.page.identifier = location.href.replace(/[\s\S]+.org\//, ''); // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+                };
+
+                (function () { // DON'T EDIT BELOW THIS LINE
+                    var d = document,
+                        s = d.createElement('script');
+                    s.src = 'https://baltophoto.disqus.com/embed.js';
+                    s.setAttribute('data-timestamp', +new Date());
+                    (d.head || d.body).appendChild(s);
+                })();
+            </script>
+            <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered
+                    by Disqus.</a></noscript> -->
+        </div>
+        <div class="innerFLEX" style="background: white;">
+            <div id="tagCloud"></div>
+            <div id="relatedImages">
+                <h4>Related Photos:</h4>
+                <div id="main"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer" style="padding: 15px;background: #000000d4; color:white">
+        This project provides photos of Baltimore City to individuals and corporations at no charge. If you would like
+        to contribute, visit the about page. <br> These images may be used for any commercial or non-commercial use.
+        Attribution and credit is required, please list source as "baltophoto.org" or the photographer's name.<br>
+        <strong><a href="/about/">More Info</a> |
+            <a href="/">Random</a> |
+            <a href="/api/">API</a> |
+            <a href="/upload/">Upload</a> |
+            <a href="/reload/">Force Reload</a></strong>
+
+
+    </div>
+
+
+
+    <script>
+
+
+        if (location.href.match(/orangesloth/ig)) {
+            location.assign('http://orangesloth.com/');
+        }
+
+
+        if (location.href.match(/clear/ig)) {
+            delete sessionStorage.baltoPhoto;
+            location.assign(location.href.replace(/clear/ig, ''));
+        }
+
+        function extractQueryString() {
+            if (location.href.match(/\?/ig)) {
+                var z = location.href.replace(/[\s\S]+\?/, '');
+                qs = {};
+                for (let a of z.split("&")) {
+                    if (a.match(/=/)) {
+                        var prop = a.split("=")[0].trim();
+                        var value = a.split("=")[1].trim();
+                        window[prop] = value;
+                        qs[prop] = value;
+                    }
+                }
+            }
+        }
+        extractQueryString();
+
+        if (sessionStorage.baltoPhoto) {
+            window.photos = JSON.parse(sessionStorage.baltoPhoto);
+            console.log(window.photos);
+            console.log("Database is stored locally.");
+            buildTagBase();
+            pickone();
+            build();
+            buildTagCloud();
+        }
+
+        if (!sessionStorage.baltoPhoto) {
+            console.log("Database needs refreshing. photosJS.json?t=" + Date.now()
+            );
+            fetch("photosJS.json?t=" + Date.now())
+                .then(r => {
+                    return r.text()
+                })
+                .then(a => {
+                    window.photos = JSON.parse(a);
+                    sessionStorage.baltoPhoto = a;
+                    console.log(window.photos);
+                    buildTagBase();
+                    pickone();
+                    build();
+                    buildTagCloud();
+                });
+        }
+
+        function adjustSocialMedia(THEURL, PHOTOURL, DESCRIPTION) {
+            var sm = ` <meta property="og:url" content="THEURL" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="baltophoto.org" />
+        <meta property="og:description" content="DESCRIPTION" />
+        <meta property="og:image" content="PHOTOURL" />
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="http://baltophoto.org/">
+        <meta name="twitter:creator" content="@hankenstein">
+        <meta name="twitter:title" content="DESCRIPTION">
+        <meta name="twitter:description" content="baltophoto.org">
+        <meta name="twitter:image" content="PHOTOURL">`;
+            var el = document.getElementById('socialMedia');
+            sm = sm.replace(/THEURL/g, THEURL);
+            sm = sm.replace(/PHOTOURL/g, PHOTOURL);
+            sm = sm.replace(/DESCRIPTION/g, DESCRIPTION);
+            document.getElementById('socialMedia').innerHTML = sm;
+        }
+
+        function showID() {
+            console.log('need to find a showID function effects');
+            return;
+        }
+
+
+
+        function getAllImageData() {
+            console.log('need to find a beter way to sync exif');
+        }
+
+
+        function buildTagBase() {
+            var tagBase = [];
+            var arr = [];
+            for (let a of photos) {
+                if (!a.description) {
+                    a.description = 'baltimore';
+                    a.tags = 'baltimore';
+                }
+                var s = a.description.replace(/_|\-/ig, ' ') + " " + a.tags.replace(/_|\-/ig, ' ');
+                s = s.split(" ");
+                for (let f of s) {
+                    arr.push(f.toLowerCase());
+                }
+            }
+            arr = Array.from(new Set(arr));
+            for (let a of arr) {
+                if (a.length > 3 && a.match(/[a-z]/)) {
+                    tagBase.push(a);
+                }
+            }
+            shuffle(tagBase);
+            window.tagBase = tagBase;
+
+        }
+
+
+
+
+        function search() {
+
+            var el = document.getElementsByClassName('containerFLEX')[0];
+            el.innerHTML = '';
+            var tag = document.getElementById('filter').value.trim();
+            var re = new RegExp(tag, 'ig');
+            matchSearchTags(tag);
+            var arr = [];
+            for (let a of photos) {
+                if (a.id.match(re)) {
+                    arr.push(a);
+                }
+            }
+            populateSearch(arr, el);
+        }
+
+        function searchmobile() {
+
+            var el = document.getElementsByClassName('containerFLEX')[0];
+            el.innerHTML = '';
+            var re = new RegExp(document.getElementById('filtermobile').value.trim(), 'ig');
+            var arr = [];
+            for (let a of photos) {
+                if (a.id.match(re)) {
+                    arr.push(a);
+                }
+            }
+            populateSearch(arr, el);
+        }
+
+
+        function populateSearch(arr, element) {
+
+            var out = '';
+            var i = 0;
+            for (let a of arr) {
+                var pic1500 = `/400/${a.id}.jpg`;
+                var title = a.id.replace(/[^a-z]+/ig, ' ');
+                out += `<a href="//baltophoto.org/?id=${a.id}">
+				<div title="${title}" class="miniPreview"  id="psq${i}" style="background: url(${pic1500}) center center / cover;margin: 3px; width:300px;height:300px;">
+                    <div style="background: black; color: white; padding: 10px;">${title}</div>
+                    </div></a>`;
+                i++;
+            }
+            out = `<div class="mouth" style="margin-top: 172px;">${out}</div>`;
+            if (element) {
+
+                element.innerHTML += out + `<h4>Related Photos:</h4><div id="srelated"></div>`;
+            }
+
+            showSearchRelated();
+            //buildTagCloud();
+        }
+
+
+
+        function populate(arr, element) {
+            var out = '';
+            var i = 0;
+            for (let a of arr) {
+                var title = a.id.replace(/[^a-z]+/ig, ' ');
+                var pic1500 = `/400/${a.id}.jpg`;
+                out += `<a href="//baltophoto.org/?id=${a.id}" >
+				<div title="${title}" class="miniPreview"  id="psq${i}" style="background: url(${pic1500}) center center / cover;margin: 3px;"></div>`;
+                i++;
+            }
+            if (element) {
+                element.innerHTML += out;
+            }
+        }
+
+
+
+
+        function showSearchRelated() {
+            var out = '';
+            var i = 0;
+            var arr = [];
+            shuffle(photos);
+            for (var i = 0; i < 40; i++) {
+                arr.push(photos[i]);
+            }
+            populate(arr, document.getElementById('srelated'));
+            //document.getElementById('cflex123').style.textAlign="center";
+            document.getElementById('cflex123').style.margin = "123px 20px";
+        }
+
+
+
+        function build() {
+            var out = '';
+            var i = 0;
+            var arr = [];
+            shuffle(photos);
+            for (var i = 0; i < 40; i++) {
+                arr.push(photos[i]);
+            }
+            populate(arr, document.getElementById('main'));
+        }
+
+        function shuffle(a) {
+            var c = a.length, t, r;
+            while (0 !== c) {
+                r = Math.floor(Math.random() * c);
+                c -= 1;
+                t = a[c];
+                a[c] = a[r];
+                a[r] = t;
+            } return a;
+        }
+
+
+        function pickone() {
+            if (location.href.match(/\?q=/ig)) {
+                document.getElementById('filter').value = location.href.replace(/[\s\S]+=/, '');
+                search();
+                return;
+            }
+            var id = shuffle(photos)[0];
+            var uid = '';
+            var path = location.href.replace(/[\s\S]+\.org./, '');
+            console.log(`the path is ${path}`);
+            if (path.match(/\?id=/)) {
+                uid = path.replace(/\?id=/, '');
+                for (let a of photos) {
+                    if (a.id == uid) {
+                        id = a;
+                    }
+                }
+                console.log(`the uid is ` + uid);
+            }
+            if (path.length > 5) {
+                if (!uid) {
+                    uid = location.href.replace(/[\s\S]+\.org./, '').replace(/\?reload/ig, '');
+                    console.log(`the natural uid is ` + uid);
+                    for (let a of photos) {
+                        if (a.id == uid) {
+                            id = a;
+                        }
+                    }
+                }
+            }
+            var mainImage = `//baltophoto.org/1500/${id.id}.jpg`;
+            var dlimage = `${id.id}.jpg`;
+            adjustSocialMedia(location.href, mainImage, id.description);
+            var f = '';
+            for (let y in id) {
+                f += `<b>${y}</b>: ${id[y]}<br>`;
+            }
+
+            var out = `
+            <div id="theOne" style="width:100%; margin:0% 0%;">
+                <div title="${id.id}" onclick="download('${dlimage}')" class="previewSquare" style="cursor:pointer; display: inline-block; margin: auto;">
+                    <img src="${mainImage}" style="max-width:100%; border-radius:8px;">
+                   </div> 
+                   <div>
+                    <a href="//baltophoto.org/${id.id}"><h2>${id.description.replace(/[^A-Za-z0-9]+/ig, ' ')}</h2></a>
+                    <div class="imageInformation" title='${JSON.stringify(id)}'><div>${f}<div id="EXIF"></div></div></div><br><br>
+                    <img src="${mainImage}" onclick="download('${dlimage}')" style="height:90px;cursor:pointer;border-radius:8px;"><br>
+                    <button class="orangesubmitbox1" onclick="download('${dlimage}')">Download Photo</button>
+
+                    <div style="margin-top:15px; max-width:500px;font-size:10px;">
+            
+           
+       <br><a href="/uploads/${dlimage}" target="_blank">${id.id}</a>
+    </div>
+                     
+                   </div></div>`;
+
+            //  | <a href="http://madewithloveinbaltimore.org" style="font-size:10px;">Made with &hearts; in Baltimore</a>
+            document.getElementById('focus').innerHTML = out;
+            document.title = document.title.replace("Free Stock Photos", id.id).replace(/\-+/ig, ' ');
+            populateEXIF(`uploads/${id.id}.jpg`);
+        }
+
+        function populateEXIF(photourl) {
+            fetch(`/getEXIF.php?url=${photourl}`)
+                .then(r => {
+                    return r.text()
+                })
+                .then(a => {
+                    document.getElementById('EXIF').innerHTML = a;
+                    getAllImageData();
+                });
+        }
+
+        function matchSearchTags(tag) {
+            var out = '';
+            var re = new RegExp(tag, 'ig');
+            for (let a of tagBase) {
+                if (a.match(re)) {
+                    out += ` <a href="/?q=${a}">${a}</a> `;
+                }
+            }
+            out = `<div id="matchedPics">${out}</div>`;
+            var el = document.getElementById('ttcc');
+            //el.style.marginTop = `316px`;
+            el.innerHTML = `<b>Matched Search terms</b>: ${out}`;
+        }
+
+        function buildTagCloud() {
+            var out = '';
+            var tc = '';
+            var i = 0;
+            for (let a of tagBase) {
+                if (i < 15) {
+                    out += ` <a href="/?q=${a}">${a}</a> `;
+                }
+                i++;
+            }
+            //cloud.sort();
+            shuffle(tagBase);
+
+            var tc3 = '';
+            for (let a of tagBase) {
+                tc3 += ` <a href="/?q=${a}">${a}</a> `;
+            }
+            document.getElementById('tagCloud').innerHTML = `<b>Explore Search terms</b>: ${out}`;
+            document.getElementById('main').innerHTML += `<br><br><b>Explore Search terms</b>: ${tc3}`;
+        }
+
+
+        async function download(id) {
+            const image = await fetch(`/uploads/${id}`);
+            const imageBlog = await image.blob();
+            const imageURL = URL.createObjectURL(imageBlog);
+
+            const link = document.createElement('a');
+            link.href = imageURL;
+            link.download = `baltophoto.org-${id}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        //  ${JSON.stringify(id).replace(/"/ig,' ')} 
+        // /master.json.txtle
+        /*
+        { description : patterson park walking path , tags : patterson park walking path , photographername : seafood at market , photographerurl : , photographeremail : hank@silvercrayon.com , photourl : http://baltophoto.org/uploads/patterson-park-walking-path-BPXNMgnx8.jpg , photosize : 0 kb , origname : , id : patterson-park-walking-path-BPXNMgnx8 , timestamp : 2016-07-21--21-20-26 , thumbnailurl : http://baltophoto.org/thumbnails/patterson-park-walking-path-BPXNMgnx8.jpg , caption : , filenumber :329}
+        */
+
+
+
+    </script>
+
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-185KQ538E2"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-185KQ538E2');
+    </script>
+
+    <!-- <script id="Skiptalk curtain 1" async src="https://silvercrayon.us/brandboard/4AZQfYhcBvYdKR5u"></script> -->
+
+    <!-- <script id="Ford prefooter" async src="https://silvercrayon.us/brandboard/fMdJ4zVmYAoUIlXQ"></script> -->
+    </div>
+</body>
+
+</html>
