@@ -307,7 +307,7 @@
             var out = '';
             var i = 0;
             for (let a of arr) {
-                var pic1500 = `uploads/${a.id}.jpg`;
+                var pic1500 = `uploads/400/${a.id}.jpg`;
                 var title = a.id.replace(/[^a-z]+/ig, ' ');
                 out += `<a href="//baltophoto.org/?id=${a.id}">
 				<div title="${title}" class="miniPreview"  id="psq${i}" style="background: url(${pic1500}) center center / cover;margin: 3px; width:300px;height:300px;">
@@ -332,7 +332,7 @@
             var i = 0;
             for (let a of arr) {
                 var title = a.id.replace(/[^a-z]+/ig, ' ');
-                var pic1500 = `uploads/${a.id}.jpg`;
+                var pic1500 = `uploads/400/${a.id}.jpg`;
                 out += `<a href="//baltophoto.org/?id=${a.id}" >
 				<div title="${title}" class="miniPreview"  id="psq${i}" style="background: url(${pic1500}) center center / cover;margin: 3px;"></div>`;
                 i++;
