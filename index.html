@@ -76,9 +76,9 @@
 
     <div class="topnav"
         style="width:100%; padding:0px 20px 10px; position:fixed; top:0px; background-color:white; box-shadow: 0 0 9px rgba(0, 0, 0, 0.5) !important; z-index: 10;">
-        <div style="float:left; max-width:450px;"> <span class="style2" style="float:left;"><a
-                    href="//baltophoto.org/"><img src="/baltophoto.org.logo.png" alt="Baltimore Photographs"
-                        style="max-width:100%;" border="0"></a></span><br>
+        <div style="float:left; max-width:450px;"> <span class="style2" style="float:left;"><a href="./"><img
+                        src="/baltophoto.org.logo.png" alt="Baltimore Photographs" style="max-width:100%;"
+                        border="0"></a></span><br>
         </div>
         <div style="float:left; margin-top:40px;">
             <form action="/" onmouseover="showID('top-description');">
@@ -184,6 +184,20 @@
         }
         extractQueryString();
 
+        if (!sessionStorage.exifData) {
+            fetch("exif-data.json?t=" + Date.now())
+                .then(r => {
+                    return r.text()
+                })
+                .then(a => {
+                    sessionStorage.exifData = a;
+                    window.exifData = JSON.parse(a);
+
+                });
+        } else {
+            window.exifData = JSON.parse(sessionStorage.exifData);
+        }
+
         if (sessionStorage.baltoPhoto) {
             window.photos = JSON.parse(sessionStorage.baltoPhoto);
             console.log(window.photos);
@@ -211,6 +225,10 @@
                     buildTagCloud();
                 });
         }
+
+
+
+
 
         function adjustSocialMedia(THEURL, PHOTOURL, DESCRIPTION) {
             var sm = ` <meta property="og:url" content="THEURL" />
@@ -309,7 +327,7 @@
             for (let a of arr) {
                 var pic1500 = `uploads/400/${a.id}.jpg`;
                 var title = a.id.replace(/[^a-z]+/ig, ' ');
-                out += `<a href="//baltophoto.org/?id=${a.id}">
+                out += `<a href="?id=${a.id}">
 				<div title="${title}" class="miniPreview"  id="psq${i}" style="background: url(${pic1500}) center center / cover;margin: 3px; width:300px;height:300px;">
                     <div style="background: black; color: white; padding: 10px;">${title}</div>
                     </div></a>`;
@@ -333,7 +351,7 @@
             for (let a of arr) {
                 var title = a.id.replace(/[^a-z]+/ig, ' ');
                 var pic1500 = `uploads/400/${a.id}.jpg`;
-                out += `<a href="//baltophoto.org/?id=${a.id}" >
+                out += `<a href="?id=${a.id}" >
 				<div title="${title}" class="miniPreview"  id="psq${i}" style="background: url(${pic1500}) center center / cover;margin: 3px;"></div>`;
                 i++;
             }
@@ -390,7 +408,7 @@
                 return;
             }
             var id = shuffle(photos)[0];
-            var uid = '';
+            window.uid = id;
             var path = location.href.replace(/[\s\S]+\.org./, '');
             console.log(`the path is ${path}`);
             if (path.match(/\?id=/)) {
@@ -413,7 +431,7 @@
                     }
                 }
             }
-            var mainImage = `//baltophoto.org/uploads/${id.id}.jpg`;
+            var mainImage = `uploads/${id.id}.jpg`;
             var dlimage = `${id.id}.jpg`;
             adjustSocialMedia(location.href, mainImage, id.description);
             var f = '';
@@ -421,14 +439,32 @@
                 f += `<b>${y}</b>: ${id[y]}<br>`;
             }
 
+            var exout = '';
+            var iiid = id.id;
+
+            console.log(`the id is ${iiid}`);
+            console.log(`the exif data is: ` + JSON.stringify(exifData[iiid]));
+
+            if (window.exifData[iiid]) {
+                var ja = exifData[iiid]
+                for (let a in ja) {
+                    exout += `<b>${a}</b>: ${ja[a]}<br>`;
+                }
+                // 
+                //exout += JSON.stringify(exifData[iiid]);
+            }
+
+
+
+
             var out = `
             <div id="theOne" style="width:100%; margin:0% 0%;">
                 <div title="${id.id}" onclick="download('${dlimage}')" class="previewSquare" style="cursor:pointer; display: inline-block; margin: auto;">
                     <img src="${mainImage}" style="max-width:100%; border-radius:8px;">
                    </div> 
                    <div>
-                    <a href="//baltophoto.org/${id.id}"><h2>${id.description.replace(/[^A-Za-z0-9]+/ig, ' ')}</h2></a>
-                    <div class="imageInformation" title='${JSON.stringify(id)}'><div>${f}<div id="EXIF"></div></div></div><br><br>
+                    <a href="./${id.id}"><h2>${id.description.replace(/[^A-Za-z0-9]+/ig, ' ')}</h2></a>
+                    <div  class="imageInformation" title='${JSON.stringify(id)}'><div>${f}<div id="EXIF">${exout}</div></div></div><br><br>
                     <img src="${mainImage}" onclick="download('${dlimage}')" style="height:90px;cursor:pointer;border-radius:8px;"><br>
                     <button class="orangesubmitbox1" onclick="download('${dlimage}')">Download Photo</button>
 
@@ -444,17 +480,32 @@
             document.getElementById('focus').innerHTML = out;
             document.title = document.title.replace("Free Stock Photos", id.id).replace(/\-+/ig, ' ');
             // populateEXIF(`uploads/${id.id}.jpg`);
+            //populateEXIF(id);
         }
 
-        function populateEXIF(photourl) {
-            fetch(`/getEXIF.php?url=${photourl}`)
-                .then(r => {
-                    return r.text()
-                })
-                .then(a => {
-                    document.getElementById('EXIF').innerHTML = a;
-                    getAllImageData();
-                });
+        // populateEXIF('patterson-park-pond-001-BPXofFCoJ', 'photourl')
+        // 
+        // patterson-park-pond-001-BPXofFCoJ
+
+        function populateEXIF(id) {
+            var out = '';
+            for (let a of exifData) {
+                if (a.id === id) {
+                    for (let b in a) {
+                        out += `<b>${b}</b>: ${a[b]}<br>`;
+                    }
+                }
+            }
+            document.getElementById('EXIF').innerHTML = out;
+            //getAllImageData();
+            // fetch(`/getEXIF.php?url=${photourl}`)
+            //     .then(r => {
+            //         return r.text()
+            //     })
+            //     .then(a => {
+            //         document.getElementById('EXIF').innerHTML = a;
+            //         getAllImageData();
+            //     });
         }
 
         function matchSearchTags(tag) {
@@ -462,7 +513,7 @@
             var re = new RegExp(tag, 'ig');
             for (let a of tagBase) {
                 if (a.match(re)) {
-                    out += ` <a href="/?q=${a}">${a}</a> `;
+                    out += ` <a href="./?q=${a}">${a}</a> `;
                 }
             }
             out = `<div id="matchedPics">${out}</div>`;
@@ -477,7 +528,7 @@
             var i = 0;
             for (let a of tagBase) {
                 if (i < 15) {
-                    out += ` <a href="/?q=${a}">${a}</a> `;
+                    out += ` <a href="./?q=${a}">${a}</a> `;
                 }
                 i++;
             }
@@ -486,7 +537,7 @@
 
             var tc3 = '';
             for (let a of tagBase) {
-                tc3 += ` <a href="/?q=${a}">${a}</a> `;
+                tc3 += ` <a href="./?q=${a}">${a}</a> `;
             }
             document.getElementById('tagCloud').innerHTML = `<b>Explore Search terms</b>: ${out}`;
             document.getElementById('main').innerHTML += `<br><br><b>Explore Search terms</b>: ${tc3}`;
