@@ -442,17 +442,19 @@
             var exout = '';
             var iiid = id.id;
 
-            console.log(`the id is ${iiid}`);
-            console.log(`the exif data is: ` + JSON.stringify(exifData[iiid]));
 
-            if (window.exifData[iiid]) {
-                var ja = exifData[iiid]
-                for (let a in ja) {
-                    exout += `<b>${a}</b>: ${ja[a]}<br>`;
+            try {
+                if (window.exifData[iiid]) {
+                    console.log(`the id is ${iiid}`);
+                    console.log(`the exif data is: ` + JSON.stringify(exifData[iiid]));
+                    var ja = exifData[iiid]
+                    for (let a in ja) {
+                        exout += `<b>${a}</b>: ${ja[a]}<br>`;
+                    }
+                    // 
+                    //exout += JSON.stringify(exifData[iiid]);
                 }
-                // 
-                //exout += JSON.stringify(exifData[iiid]);
-            }
+            } catch (e) { }
 
 
 
